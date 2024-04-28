@@ -1,6 +1,6 @@
 {
 	"name": "@akrc/monorepo-tools",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"description": "",
 	"scripts": {
 		"test": "vitest",
@@ -30,7 +30,9 @@
 	"module": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"type": "module",
-	"files": ["./dist"],
+	"files": [
+		"./dist"
+	],
 	"exports": {
 		"types": "./dist/index.d.ts",
 		"import": "./dist/index.js"
