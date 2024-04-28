@@ -1,30 +1,34 @@
 {
-    "name": "@akrc/monorepo-tools",
-    "version": "1.1.0",
-    "description": "",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "tsup"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "dependencies": {
-        "@pnpm/find-workspace-dir": "^7.0.0",
-        "@pnpm/fs.find-packages": "^3.0.0",
-        "ajv": "^8.12.0",
-        "read-package-up": "^11.0.0"
-    },
-    "devDependencies": {
-        "@types/node": "^20.12.7",
-        "tslib": "^2.6.2",
-        "tsup": "^8.0.2",
-        "typescript": "^5.4.5"
-    },
-    "module": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "type": "module",
-    "files": [
-        "./dist"
-    ]
+	"name": "@akrc/monorepo-tools",
+	"version": "1.1.0",
+	"description": "",
+	"scripts": {
+		"test": "vitest",
+		"build": "tsup",
+		"fmt": "biome check . --apply"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@pnpm/fs.find-packages": "^3.0.0",
+		"fast-glob": "^3.3.2",
+		"find-up": "^7.0.0",
+		"package-up": "^5.0.0",
+		"read-package-up": "^11.0.0",
+		"yaml": "^2.4.1"
+	},
+	"devDependencies": {
+		"@akrc/tsconfig": "^1.0.0",
+		"@biomejs/biome": "1.7.1",
+		"@types/node": "^20.12.7",
+		"tslib": "^2.6.2",
+		"tsup": "^8.0.2",
+		"typescript": "^5.4.5",
+		"vitest": "^1.5.2"
+	},
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"type": "module",
+	"files": ["./dist"]
 }

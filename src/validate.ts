@@ -1,15 +1,14 @@
-import Ajv from "ajv";
-import { PackageJson } from "read-package-up";
+import type { PackageJson } from "read-package-up";
 
-const ajv = new Ajv();
-
-export const packageJsonSchema = await fetch(
-    "https://json.schemastore.org/package.json"
-).then((res) => res.json());
-
-export const validatePackageJson = (pkg: any): PackageJson => {
-    if (!ajv.validate(packageJsonSchema, pkg)) {
-        throw new Error(ajv.errorsText());
-    }
-    return pkg as PackageJson;
-};
+/**
+ * Validates the package.json object.
+ *
+ * @param pkg - The package.json object to validate.
+ * @returns The validated package.json object.
+ * @throws Error if the package.json object is empty.
+ */
+export function validatePackageJson(pkg: unknown): PackageJson {
+	// TODO: validate package.json
+	if (!pkg) throw new Error("package.json is empty");
+	return pkg as PackageJson;
+}

@@ -1,0 +1,12 @@
+lockfileVersion: '9.0'
+
+settings:
+    autoInstallPeers: true
+    excludeLinksFromLockfile: false
+
+importers:
+    .: {}
+
+    packages/pnpm-pkg-1: {}
+
+    packages/pnpm-pkg-2: {}
