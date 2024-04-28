@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { findPackages } from "@pnpm/fs.find-packages";
-import { glob } from "fast-glob";
+import glob from "fast-glob";
 import { findAndParseJson, getWorkspaceMonorepoConfig } from "./utils";
 import { validatePackageJson } from "./validate";
 
