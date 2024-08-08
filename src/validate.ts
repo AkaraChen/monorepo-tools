@@ -7,7 +7,7 @@ import type { PackageJson } from "read-package-up";
  * @returns The validated package.json object.
  * @throws Error if the package.json object is empty.
  */
-export function validatePackageJson(pkg: unknown): PackageJson {
+export function parsePackage(pkg: unknown): PackageJson {
 	// TODO: validate package.json
 	if (!pkg) throw new Error("package.json is empty");
 	return pkg as PackageJson;

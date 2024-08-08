@@ -1,20 +1,12 @@
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { loadJsonFile } from "load-json-file";
 import type { PackageJson } from "read-package-up";
 import yaml from "yaml";
-import { validatePackageJson } from "./validate";
+import { parsePackage } from "./validate";
 
-export async function findAndParseJson<T>(name: string): Promise<T | null> {
-	if (existsSync(name) === false) {
-		return null;
-	}
-	const content = await readFile(name, "utf-8");
-	const json = JSON.parse(content);
-	return json as T;
-}
-
-export function safeResolve(lastResult: string, ...args: string[]) {
+export function resolve(lastResult: string, ...args: string[]) {
 	const result = path.resolve(lastResult, ...args);
 	if (lastResult === result) {
 		throw new Error("Encountered an infinite loop while resolving path");
@@ -22,9 +14,7 @@ export function safeResolve(lastResult: string, ...args: string[]) {
 	return result;
 }
 
-export function getWorkspaceGlobsByPackageJson(
-	packageJson: PackageJson,
-): string[] {
+function readGlobConfig(packageJson: PackageJson): string[] {
 	if (packageJson.workspaces) {
 		const workspaces = packageJson.workspaces;
 		const workspaceDirs = Array.isArray(workspaces)
@@ -44,22 +34,22 @@ export function getWorkspaceGlobsByPackageJson(
  * @returns The monorepo configuration object.
  * @throws Error if no monorepo configuration is found.
  */
-export async function getWorkspaceMonorepoConfig(root: string) {
+export async function readConfig(root: string) {
 	const pnpmWorkspace = path.join(root, "pnpm-workspace.yaml");
 	if (existsSync(pnpmWorkspace)) {
 		return {
-			type: "pnpm",
+			pm: "pnpm",
 			globs: yaml.parse(await readFile(pnpmWorkspace, "utf-8"))
 				.packages as string[],
 		};
 	}
 	const yarnWorkspace = path.join(root, "package.json");
 	if (existsSync(yarnWorkspace)) {
-		const globs = getWorkspaceGlobsByPackageJson(
-			validatePackageJson(await findAndParseJson<PackageJson>(yarnWorkspace)),
+		const globs = readGlobConfig(
+			parsePackage(await loadJsonFile<PackageJson>(yarnWorkspace)),
 		);
 		return {
-			type: "yarn",
+			pm: "yarn",
 			globs,
 		};
 	}

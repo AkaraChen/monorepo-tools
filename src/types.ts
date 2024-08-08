@@ -1,5 +1,1 @@
-export enum PackageManagerName {
-	NPM = "npm",
-	YARN = "yarn",
-	PNPM = "pnpm",
-}
+export type PM = "npm" | "yarn" | "pnpm";

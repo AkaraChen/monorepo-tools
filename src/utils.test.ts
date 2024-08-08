@@ -2,20 +2,20 @@ import { platform } from "node:os";
 import path from "node:path";
 import { expect, test } from "vitest";
 import { pnpmFixture, yarnFixture } from "../test";
-import { getWorkspaceMonorepoConfig, safeResolve } from "./utils";
+import { readConfig, resolve } from "./utils";
 
 test("safe resolve", () => {
 	expect(() => {
-		safeResolve(platform() === "win32" ? "C:\\" : "/");
+		resolve(platform() === "win32" ? "C:\\" : "/");
 	}).toThrowError();
 });
 
 test("get monorepo config", async () => {
-	const pnpmConfig = await getWorkspaceMonorepoConfig(pnpmFixture);
-	expect(pnpmConfig.type).toBe("pnpm");
+	const pnpmConfig = await readConfig(pnpmFixture);
+	expect(pnpmConfig.pm).toBe("pnpm");
 
-	const yarnConfig = await getWorkspaceMonorepoConfig(yarnFixture);
-	expect(yarnConfig.type).toBe("yarn");
+	const yarnConfig = await readConfig(yarnFixture);
+	expect(yarnConfig.pm).toBe("yarn");
 
-	expect(() => getWorkspaceMonorepoConfig(__dirname)).rejects.toThrowError();
+	expect(() => readConfig(__dirname)).rejects.toThrowError();
 });

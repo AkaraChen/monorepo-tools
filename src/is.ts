@@ -2,15 +2,16 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { findPackages } from "@pnpm/fs.find-packages";
 import glob from "fast-glob";
-import { findAndParseJson, getWorkspaceMonorepoConfig } from "./utils";
-import { validatePackageJson } from "./validate";
+import { loadJsonFile } from "load-json-file";
+import { readConfig } from "./utils";
+import { parsePackage } from "./validate";
 
 /**
  * Checks if the specified directory is the root of a monorepo.
  * @param searchDir The directory to search for monorepo configuration files.
  * @returns A promise that resolves to `true` if the directory is a monorepo root, or `false` otherwise.
  */
-export async function isMonorepoRoot(searchDir: string): Promise<boolean> {
+export async function isRoot(searchDir: string): Promise<boolean> {
 	const configFiles = ["pnpm-workspace.yaml", "lerna.json"];
 	const haveConfigFiles = configFiles.some((f) =>
 		existsSync(path.join(searchDir, f)),
@@ -19,9 +20,9 @@ export async function isMonorepoRoot(searchDir: string): Promise<boolean> {
 		return true;
 	}
 	const packageJsonPath = path.join(searchDir, "package.json");
-	const json = await findAndParseJson(packageJsonPath);
+	const json = await loadJsonFile(packageJsonPath);
 	try {
-		const pkg = validatePackageJson(json);
+		const pkg = parsePackage(json);
 		if (pkg.workspaces) {
 			return true;
 		}
@@ -38,20 +39,17 @@ export async function isMonorepoRoot(searchDir: string): Promise<boolean> {
  * @param workspaceDir - The directory of the workspace to check.
  * @returns A boolean indicating whether the workspace is in a monorepo.
  */
-export async function isWorkspaceInMonorepo(
-	root: string,
-	workspaceDir: string,
-) {
+export async function isInMonorepo(root: string, workspaceDir: string) {
 	const relative = path.relative(root, workspaceDir);
 	if (relative.startsWith("..")) {
 		return false;
 	}
-	const { globs: config } = await getWorkspaceMonorepoConfig(root);
+	const { globs: config } = await readConfig(root);
 	if (!config) {
 		return false;
 	}
 	const packageDirs = await findPackages(root).then((packages) => {
-		return packages.map((p) => p.dir);
+		return packages.map((p) => p.rootDir);
 	});
 	for (const wDir of config) {
 		const globResults = await glob(wDir, {

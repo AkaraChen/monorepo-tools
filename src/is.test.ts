@@ -1,28 +1,22 @@
 import path from "node:path";
 import { expect, test } from "vitest";
 import { pnpmFixture, yarnFixture } from "../test";
-import { isMonorepoRoot, isWorkspaceInMonorepo } from "./is";
+import { isInMonorepo, isRoot } from "./is";
 
 test("is monorepo root", async () => {
-	expect(await isMonorepoRoot(pnpmFixture)).toBe(true);
-	expect(await isMonorepoRoot(yarnFixture)).toBe(true);
-	expect(await isMonorepoRoot(__dirname)).toBe(false);
+	expect(await isRoot(pnpmFixture)).toBe(true);
+	expect(await isRoot(yarnFixture)).toBe(true);
+	expect(async () => await isRoot(__dirname)).rejects.toThrow();
 });
 
 test("is workspace in monorepo", async () => {
 	expect(
-		await isWorkspaceInMonorepo(
-			pnpmFixture,
-			path.join(pnpmFixture, "packages", "pkg1"),
-		),
+		await isInMonorepo(pnpmFixture, path.join(pnpmFixture, "packages", "pkg1")),
 	).toBe(true);
-	expect(await isWorkspaceInMonorepo(pnpmFixture, yarnFixture)).toBe(false);
+	expect(await isInMonorepo(pnpmFixture, yarnFixture)).toBe(false);
 
 	expect(
-		await isWorkspaceInMonorepo(
-			yarnFixture,
-			path.join(yarnFixture, "packages", "pkg1"),
-		),
+		await isInMonorepo(yarnFixture, path.join(yarnFixture, "packages", "pkg1")),
 	).toBe(true);
-	expect(await isWorkspaceInMonorepo(yarnFixture, pnpmFixture)).toBe(false);
+	expect(await isInMonorepo(yarnFixture, pnpmFixture)).toBe(false);
 });

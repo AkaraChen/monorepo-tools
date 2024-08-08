@@ -1,10 +1,5 @@
-export { findProjects, findUpRoot, findUpRootPackageJson } from "./find";
-export { isMonorepoRoot, isWorkspaceInMonorepo } from "./is";
-export { validatePackageJson } from "./validate";
-export {
-	getPackageManager,
-	getPackageManagerByLockfile,
-	getPackageManagerByUserAgent,
-} from "./pm";
-export { PackageManagerName } from "./types";
-export { getWorkspaceMonorepoConfig } from "./utils";
+export { scanProjects, findUpRoot } from "./find";
+export { isRoot, isInMonorepo } from "./is";
+export { detectPM, detectPMByLock, detectPMByUA } from "./pm";
+export type { PM } from "./types";
+export { readConfig } from "./utils";
