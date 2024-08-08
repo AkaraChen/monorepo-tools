@@ -5,7 +5,8 @@
     "scripts": {
         "test": "vitest",
         "build": "tsup",
-        "fmt": "biome check . --apply"
+        "fmt": "biome check . --apply",
+        "doc": "typedoc src/index.ts --plugin typedoc-material-theme  --themeColor '#1C6EF3'"
     },
     "keywords": [],
     "author": "",
@@ -26,6 +27,8 @@
         "@types/node": "^22.1.0",
         "tslib": "^2.6.2",
         "tsup": "^8.0.2",
+        "typedoc": "^0.26.5",
+        "typedoc-material-theme": "^1.1.0",
         "typescript": "^5.4.5",
         "vitest": "^2.0.5"
     },
