@@ -1,6 +1,6 @@
-import { existsSync } from "node:fs";
-import { join } from "node:path";
-import type { PM } from "./types";
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import type { PM } from './types';
 
 /**
  * Retrieves the package manager name based on the user agent.
@@ -8,13 +8,13 @@ import type { PM } from "./types";
  * @throws Throws an error if the package manager is unknown.
  */
 export function detectPMByUA(): PM {
-	const packageManager = process.env.npm_config_user_agent || "";
-	for (const key of ["npm", "pnpm", "yarn"] as const) {
-		if (packageManager.startsWith(key)) {
-			return key;
-		}
-	}
-	throw new Error("Unknown package manager");
+    const packageManager = process.env.npm_config_user_agent || '';
+    for (const key of ['npm', 'pnpm', 'yarn'] as const) {
+        if (packageManager.startsWith(key)) {
+            return key;
+        }
+    }
+    throw new Error('Unknown package manager');
 }
 
 /**
@@ -24,17 +24,17 @@ export function detectPMByUA(): PM {
  * @throws An error if the package manager cannot be determined.
  */
 export async function detectPMByLock(searchDir: string): Promise<PM> {
-	const dir = searchDir;
-	if (existsSync(join(dir, "yarn.lock"))) {
-		return "yarn";
-	}
-	if (existsSync(join(dir, "pnpm-lock.yaml"))) {
-		return "pnpm";
-	}
-	if (existsSync(join(dir, "package-lock.json"))) {
-		return "npm";
-	}
-	throw new Error("Unknown package manager");
+    const dir = searchDir;
+    if (existsSync(join(dir, 'yarn.lock'))) {
+        return 'yarn';
+    }
+    if (existsSync(join(dir, 'pnpm-lock.yaml'))) {
+        return 'pnpm';
+    }
+    if (existsSync(join(dir, 'package-lock.json'))) {
+        return 'npm';
+    }
+    throw new Error('Unknown package manager');
 }
 
 /**
@@ -45,9 +45,9 @@ export async function detectPMByLock(searchDir: string): Promise<PM> {
  * @returns A Promise that resolves to the package manager name.
  */
 export async function detectPM(searchDir: string): Promise<PM> {
-	try {
-		return await detectPMByLock(searchDir);
-	} catch {
-		return detectPMByUA();
-	}
+    try {
+        return await detectPMByLock(searchDir);
+    } catch {
+        return detectPMByUA();
+    }
 }

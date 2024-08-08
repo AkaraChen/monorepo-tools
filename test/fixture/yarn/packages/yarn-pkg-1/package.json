@@ -1,4 +1,4 @@
 {
-	"name": "yarn-pkg-1",
-	"packageManager": "yarn@4.1.1"
+    "name": "yarn-pkg-1",
+    "packageManager": "yarn@4.1.1"
 }

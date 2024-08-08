@@ -1,46 +1,46 @@
 {
-	"name": "@akrc/monorepo-tools",
-	"version": "1.2.1",
-	"description": "",
-	"scripts": {
-		"test": "vitest",
-		"build": "tsup",
-		"fmt": "biome check . --apply"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"dependencies": {
-		"@pnpm/fs.find-packages": "^4.0.2",
-		"fast-glob": "^3.3.2",
-		"find-up": "^7.0.0",
-		"load-json-file": "^7.0.1",
-		"package-up": "^5.0.0",
-		"read-package-up": "^11.0.0",
-		"yaml": "^2.4.1"
-	},
-	"devDependencies": {
-		"@akrc/tsconfig": "^1.0.0",
-		"@biomejs/biome": "1.7.1",
-		"@pnpm/types": "^12.0.0",
-		"@types/node": "^22.1.0",
-		"tslib": "^2.6.2",
-		"tsup": "^8.0.2",
-		"typescript": "^5.4.5",
-		"vitest": "^2.0.5"
-	},
-	"module": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"type": "module",
-	"files": ["./dist"],
-	"exports": {
-		"types": "./dist/index.d.ts",
-		"import": "./dist/index.js"
-	},
-	"packageManager": "pnpm@9.6.0",
-	"pnpm": {
-		"overrides": {
-			"@pnpm/fs.find-packages": "4.0.2"
-		}
-	}
+    "name": "@akrc/monorepo-tools",
+    "version": "1.2.1",
+    "description": "",
+    "scripts": {
+        "test": "vitest",
+        "build": "tsup",
+        "fmt": "biome check . --apply"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@pnpm/fs.find-packages": "^4.0.2",
+        "fast-glob": "^3.3.2",
+        "find-up": "^7.0.0",
+        "load-json-file": "^7.0.1",
+        "package-up": "^5.0.0",
+        "read-package-up": "^11.0.0",
+        "yaml": "^2.4.1"
+    },
+    "devDependencies": {
+        "@akrc/tsconfig": "^1.0.0",
+        "@biomejs/biome": "1.7.1",
+        "@pnpm/types": "^12.0.0",
+        "@types/node": "^22.1.0",
+        "tslib": "^2.6.2",
+        "tsup": "^8.0.2",
+        "typescript": "^5.4.5",
+        "vitest": "^2.0.5"
+    },
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "type": "module",
+    "files": ["./dist"],
+    "exports": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+    },
+    "packageManager": "pnpm@9.6.0",
+    "pnpm": {
+        "overrides": {
+            "@pnpm/fs.find-packages": "4.0.2"
+        }
+    }
 }
