@@ -5,6 +5,7 @@ import type { PackageJson } from 'read-package-up';
 import { readPackage } from 'read-pkg';
 import { Future, Option, Result } from 'sakiko';
 import yaml from 'yaml';
+import { detectPMByLock } from './pm';
 import type { PM, PnpmWorkspaceYaml } from './types';
 
 export function resolve(lastResult: string, ...args: string[]): Result<string> {
@@ -50,7 +51,8 @@ export function readConfig(root: string): Future<{
 
         const pkg = await readPackage({ cwd: root });
         const globs = parseWorkspaceOption(pkg).unwrap();
-        return { pm: 'yarn' as PM, globs };
+        const pm = detectPMByLock(root).unwrap();
+        return { pm, globs };
     });
 }
 
