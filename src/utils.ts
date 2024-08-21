@@ -1,31 +1,32 @@
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
-import path from 'node:path';
-import { loadJsonFile } from 'load-json-file';
+import path from 'pathe';
 import type { PackageJson } from 'read-package-up';
+import { readPackage } from 'read-pkg';
+import { Future, Option, Result } from 'sakiko';
 import yaml from 'yaml';
-import { parsePackage } from './validate';
+import type { PM, PnpmWorkspaceYaml } from './types';
 
-export function resolve(lastResult: string, ...args: string[]) {
+export function resolve(lastResult: string, ...args: string[]): Result<string> {
     const result = path.resolve(lastResult, ...args);
     if (lastResult === result) {
-        throw new Error('Encountered an infinite loop while resolving path');
+        return Result.err(new Error('Could not resolve path'));
     }
-    return result;
+    return Result.ok(result);
 }
 
-function readGlobConfig(packageJson: PackageJson): string[] {
+function parseWorkspaceOption(packageJson: PackageJson): Option<string[]> {
     if (packageJson.workspaces) {
         const workspaces = packageJson.workspaces;
         const workspaceDirs = Array.isArray(workspaces)
             ? workspaces
             : workspaces.packages;
         if (!workspaceDirs) {
-            throw new Error('No workspace config found');
+            return Option.none();
         }
-        return workspaceDirs;
+        return Option.some(workspaceDirs);
     }
-    throw new Error('No workspace config found');
+    return Option.none();
 }
 
 /**
@@ -34,24 +35,34 @@ function readGlobConfig(packageJson: PackageJson): string[] {
  * @returns The monorepo configuration object.
  * @throws Error if no monorepo configuration is found.
  */
-export async function readConfig(root: string) {
-    const pnpmWorkspace = path.join(root, 'pnpm-workspace.yaml');
-    if (existsSync(pnpmWorkspace)) {
-        return {
-            pm: 'pnpm',
-            globs: yaml.parse(await readFile(pnpmWorkspace, 'utf-8'))
-                .packages as string[],
-        };
-    }
-    const yarnWorkspace = path.join(root, 'package.json');
-    if (existsSync(yarnWorkspace)) {
-        const globs = readGlobConfig(
-            parsePackage(await loadJsonFile<PackageJson>(yarnWorkspace)),
-        );
-        return {
-            pm: 'yarn',
-            globs,
-        };
-    }
-    throw new Error('No monorepo configuration found');
+export function readConfig(root: string): Future<{
+    pm: PM;
+    globs: string[];
+}> {
+    return Future.from(async () => {
+        const pnpm = await readPnpmWorkspaceYaml(root).result();
+        if (pnpm.isOk()) {
+            const globs = pnpm.unwrap().packages;
+            if (globs) {
+                return { pm: 'pnpm', globs };
+            }
+        }
+
+        const pkg = await readPackage({ cwd: root });
+        const globs = parseWorkspaceOption(pkg).unwrap();
+        return { pm: 'yarn' as PM, globs };
+    });
+}
+
+function readYaml<T>(file: string): Future<T> {
+    return Future.from(async () => {
+        const content = await readFile(file, 'utf-8');
+        return yaml.parse(content) as T;
+    });
+}
+
+export function readPnpmWorkspaceYaml(
+    dir: string,
+): Future<Partial<PnpmWorkspaceYaml>> {
+    return Future.from(readYaml(path.join(dir, 'pnpm-workspace.yaml')));
 }

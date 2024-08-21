@@ -1,13 +1,10 @@
 import { platform } from 'node:os';
-import path from 'node:path';
 import { expect, test } from 'vitest';
 import { pnpmFixture, yarnFixture } from '../test';
 import { readConfig, resolve } from './utils';
 
 test('safe resolve', () => {
-    expect(() => {
-        resolve(platform() === 'win32' ? 'C:\\' : '/');
-    }).toThrowError();
+    expect(resolve(platform() === 'win32' ? 'C:\\' : '/').isErr()).toBe(true);
 });
 
 test('get monorepo config', async () => {

@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs';
-import { join } from 'node:path';
+import path from 'pathe';
+import { Option } from 'sakiko';
 import type { PM } from './types';
 
 /**
@@ -7,14 +8,14 @@ import type { PM } from './types';
  * @returns The package manager name.
  * @throws Throws an error if the package manager is unknown.
  */
-export function detectPMByUA(): PM {
+export function detectPMByUA(): Option<PM> {
     const packageManager = process.env.npm_config_user_agent || '';
     for (const key of ['npm', 'pnpm', 'yarn'] as const) {
         if (packageManager.startsWith(key)) {
-            return key;
+            return Option.some(key);
         }
     }
-    throw new Error('Unknown package manager');
+    return Option.none();
 }
 
 /**
@@ -23,18 +24,19 @@ export function detectPMByUA(): PM {
  * @returns A Promise that resolves to the name of the package manager.
  * @throws An error if the package manager cannot be determined.
  */
-export async function detectPMByLock(searchDir: string): Promise<PM> {
+export function detectPMByLock(searchDir: string): Option<PM> {
     const dir = searchDir;
-    if (existsSync(join(dir, 'yarn.lock'))) {
-        return 'yarn';
+    const map: Record<string, PM> = {
+        'pnpm-lock.yaml': 'pnpm',
+        'yarn.lock': 'yarn',
+        'package-lock.json': 'npm',
+    };
+    for (const [file, pm] of Object.entries(map)) {
+        if (existsSync(path.join(dir, file))) {
+            return Option.some(pm);
+        }
     }
-    if (existsSync(join(dir, 'pnpm-lock.yaml'))) {
-        return 'pnpm';
-    }
-    if (existsSync(join(dir, 'package-lock.json'))) {
-        return 'npm';
-    }
-    throw new Error('Unknown package manager');
+    return Option.none();
 }
 
 /**
@@ -44,10 +46,8 @@ export async function detectPMByLock(searchDir: string): Promise<PM> {
  * @param searchDir - The directory to search for the lockfile.
  * @returns A Promise that resolves to the package manager name.
  */
-export async function detectPM(searchDir: string): Promise<PM> {
-    try {
-        return await detectPMByLock(searchDir);
-    } catch {
-        return detectPMByUA();
-    }
+export function detectPM(searchDir: string): Option<PM> {
+    return detectPMByLock(searchDir).mapOr(Option.none(), (pm) =>
+        Option.some(pm),
+    );
 }

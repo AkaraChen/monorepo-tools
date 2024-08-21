@@ -13,11 +13,13 @@
     "license": "ISC",
     "dependencies": {
         "@pnpm/fs.find-packages": "^4.0.2",
-        "fast-glob": "^3.3.2",
         "find-up": "^7.0.0",
-        "load-json-file": "^7.0.1",
         "package-up": "^5.0.0",
+        "pathe": "^1.1.2",
         "read-package-up": "^11.0.0",
+        "read-pkg": "^9.0.1",
+        "sakiko": "^1.4.0",
+        "tinyglobby": "^0.2.2",
         "yaml": "^2.4.1"
     },
     "devDependencies": {
@@ -35,9 +37,7 @@
     "module": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "type": "module",
-    "files": [
-        "./dist"
-    ],
+    "files": ["./dist"],
     "exports": {
         "types": "./dist/index.d.ts",
         "import": "./dist/index.js"

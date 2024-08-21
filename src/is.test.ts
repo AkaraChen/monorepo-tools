@@ -1,4 +1,4 @@
-import path from 'node:path';
+import path from 'pathe';
 import { expect, test } from 'vitest';
 import { pnpmFixture, yarnFixture } from '../test';
 import { isInMonorepo, isRoot } from './is';
