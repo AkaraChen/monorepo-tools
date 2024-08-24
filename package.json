@@ -37,7 +37,9 @@
     "module": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "type": "module",
-    "files": ["./dist"],
+    "files": [
+        "./dist"
+    ],
     "exports": {
         "types": "./dist/index.d.ts",
         "import": "./dist/index.js"
@@ -45,7 +47,8 @@
     "packageManager": "pnpm@9.6.0",
     "pnpm": {
         "overrides": {
-            "@pnpm/fs.find-packages": "4.0.2"
+            "@pnpm/fs.find-packages": "4.0.2",
+            "is-core-module": "npm:@nolyfill/is-core-module@^1"
         }
     }
 }
