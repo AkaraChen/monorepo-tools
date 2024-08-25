@@ -47,6 +47,7 @@ export function readConfig(root: string): Future<{
             if (globs) {
                 return { pm: 'pnpm', globs };
             }
+            throw new Error('Invalid pnpm-workspace.yaml');
         }
 
         const pkg = await readPackage({ cwd: root });

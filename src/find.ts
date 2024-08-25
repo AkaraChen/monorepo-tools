@@ -11,7 +11,7 @@ import { readPackage } from 'read-pkg';
 import { Future } from 'sakiko';
 import { isInMonorepo } from './is';
 import type { PM } from './types';
-import { readConfig, readPnpmWorkspaceYaml, resolve } from './utils';
+import { readConfig, resolve } from './utils';
 
 /**
  * Finds the root directory of a monorepo or workspace based on the provided search directory and package manager.
@@ -22,24 +22,27 @@ import { readConfig, readPnpmWorkspaceYaml, resolve } from './utils';
  */
 export function findUpRoot(
     searchDir: string,
-    packageManager: PM,
+    packageManager?: PM,
 ): Future<string> {
     return Future.from(async () => {
         // pnpm workspaces
-        if (packageManager === 'pnpm') {
-            const dir = await findUp('pnpm-workspace.yaml', {
+        if (
+            // if not specified, or explicitly set to pnpm
+            typeof packageManager === 'undefined' ||
+            packageManager === 'pnpm'
+        ) {
+            const pnpmYamlDir = await findUp('pnpm-workspace.yaml', {
                 cwd: searchDir,
-            }).then((dir) => {
-                if (!dir) throw new Error('No workspace root found');
-                return path.dirname(dir);
             });
-            if (dir) {
-                const config = await readPnpmWorkspaceYaml(dir);
-                if (!config.packages)
-                    throw new Error('No workspace config found');
-                if (await isInMonorepo(dir, searchDir)) return dir;
+            if (pnpmYamlDir) {
+                const dirname = path.dirname(pnpmYamlDir);
+                const isRoot = await isInMonorepo(dirname, searchDir);
+                if (isRoot) return dirname;
             }
-            throw new Error('No workspace root found');
+            // if not specified pm, just jump to the next
+            if (packageManager === 'pnpm') {
+                throw new Error('No workspace root found');
+            }
         }
 
         // yarn/npm workspaces
@@ -49,7 +52,8 @@ export function findUpRoot(
             if (!pkg) throw new Error('No package.json root found');
             cwd = path.dirname(pkg.path);
             if (pkg.packageJson.workspaces) {
-                if (await isInMonorepo(cwd, searchDir)) return cwd;
+                const isRoot = await isInMonorepo(cwd, searchDir);
+                if (isRoot) return cwd;
                 throw new Error('This directory is not in the workspace');
             }
             cwd = resolve(cwd, '..').unwrap();
