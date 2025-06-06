@@ -36,9 +36,6 @@ importers:
       find-up:
         specifier: ^7.0.0
         version: 7.0.0
-      js-yaml:
-        specifier: ^4.1.0
-        version: 4.1.0
       knip:
         specifier: ^5.60.2
         version: 5.60.2(@types/node@22.15.30)(typescript@5.8.3)
