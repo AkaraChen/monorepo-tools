@@ -1,9 +1,9 @@
 import { readFile } from 'node:fs/promises';
+import * as yaml from '@akrc/yaml';
 import path from 'pathe';
 import type { PackageJson } from 'read-package-up';
 import { readPackage } from 'read-pkg';
 import { Future, Option, Result } from 'sakiko';
-import * as yaml from '@akrc/yaml';
 import { detectPMByLock } from './pm';
 import type { PM, PnpmWorkspaceYaml } from './types';
 

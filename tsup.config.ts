@@ -5,4 +5,12 @@ export default defineConfig({
     dts: true,
     format: ['esm'],
     tsconfig: 'tsconfig.json',
+    banner({ format }) {
+        if (format === 'esm')
+            return {
+                js: `import { createRequire } from 'module';
+                const require = createRequire(import.meta.url);`,
+            };
+    },
+    platform: 'node'
 });
