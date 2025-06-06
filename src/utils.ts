@@ -3,7 +3,7 @@ import path from 'pathe';
 import type { PackageJson } from 'read-package-up';
 import { readPackage } from 'read-pkg';
 import { Future, Option, Result } from 'sakiko';
-import yaml from 'yaml';
+import * as yaml from '@akrc/yaml';
 import { detectPMByLock } from './pm';
 import type { PM, PnpmWorkspaceYaml } from './types';
 
@@ -59,7 +59,7 @@ export function readConfig(root: string): Future<{
 function readYaml<T>(file: string): Future<T> {
     return Future.from(async () => {
         const content = await readFile(file, 'utf-8');
-        return yaml.parse(content) as T;
+        return yaml.load(content) as T;
     });
 }
 

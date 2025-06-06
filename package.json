@@ -14,11 +14,14 @@
     "license": "ISC",
     "devDependencies": {
         "@akrc/tsconfig": "^2.0.0",
+        "@akrc/yaml": "^4.2.0",
         "@biomejs/biome": "1.7.1",
         "@pnpm/fs.find-packages": "^4.0.2",
         "@pnpm/types": "^12.2.0",
+        "@types/js-yaml": "^4.0.9",
         "@types/node": "^22.15.30",
         "find-up": "^7.0.0",
+        "js-yaml": "^4.1.0",
         "knip": "^5.60.2",
         "pathe": "^2.0.3",
         "read-package-up": "^11.0.0",
@@ -30,8 +33,7 @@
         "typedoc": "^0.28.5",
         "typedoc-material-theme": "^1.4.0",
         "typescript": "^5.8.3",
-        "vitest": "^3.2.2",
-        "yaml": "^2.8.0"
+        "vitest": "^3.2.2"
     },
     "module": "./dist/index.js",
     "types": "./dist/index.d.ts",
