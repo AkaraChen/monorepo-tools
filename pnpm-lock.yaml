@@ -47,8 +47,8 @@ importers:
         specifier: 1.7.1
         version: 1.7.1
       '@pnpm/types':
-        specifier: ^1000.6.0
-        version: 1000.6.0
+        specifier: ^12.2.0
+        version: 12.2.0
       '@types/node':
         specifier: ^22.15.30
         version: 22.15.30
@@ -511,12 +511,12 @@ packages:
     resolution: {integrity: sha512-BSGvYd59kPKVTUk1InekEp+TiPnJ8650/bQyiOUFSvqHi61YipcR+E4H2i3xTnk2e+GHdGbXvEtAZbQmyxb0/g==}
     engines: {node: '>=18.12'}
 
-  '@pnpm/types@1000.6.0':
-    resolution: {integrity: sha512-6PsMNe98VKPGcg6LnXSW/LE3YfJ77nj+bPKiRjYRWAQLZ+xXjEQRaR0dAuyjCmchlv4wR/hpnMVRS21/fCod5w==}
-    engines: {node: '>=18.12'}
-
   '@pnpm/types@12.0.0':
     resolution: {integrity: sha512-7iookhjwjR4YwszOcGSXS4iY0oDYCGZ1kKvkHiufk/hcs2Fqh34dS5p0K5mOilwAFKcdjbl8QyNDogcOmKf3pg==}
+    engines: {node: '>=18.12'}
+
+  '@pnpm/types@12.2.0':
+    resolution: {integrity: sha512-5RtwWhX39j89/Tmyv2QSlpiNjErA357T/8r1Dkg+2lD3P7RuS7Xi2tChvmOC3VlezEFNcWnEGCOeKoGRkDuqFA==}
     engines: {node: '>=18.12'}
 
   '@pnpm/util.lex-comparator@3.0.0':
@@ -1879,9 +1879,9 @@ snapshots:
     dependencies:
       strip-comments-strings: 1.2.0
 
-  '@pnpm/types@1000.6.0': {}
-
   '@pnpm/types@12.0.0': {}
+
+  '@pnpm/types@12.2.0': {}
 
   '@pnpm/util.lex-comparator@3.0.0': {}
 

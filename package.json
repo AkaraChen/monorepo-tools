@@ -25,7 +25,7 @@
     "devDependencies": {
         "@akrc/tsconfig": "^2.0.0",
         "@biomejs/biome": "1.7.1",
-        "@pnpm/types": "^1000.6.0",
+        "@pnpm/types": "^12.2.0",
         "@types/node": "^22.15.30",
         "effect": "^3.16.4",
         "tslib": "^2.8.1",
