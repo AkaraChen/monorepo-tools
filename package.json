@@ -5,7 +5,7 @@
     "scripts": {
         "test": "vitest run",
         "build": "tsup",
-        "fmt": "biome check . --apply",
+        "check": "biome check . --apply",
         "doc": "typedoc src/index.ts --plugin typedoc-material-theme  --themeColor '#1C6EF3'",
         "knip": "knip"
     },
