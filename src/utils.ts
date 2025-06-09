@@ -7,9 +7,9 @@ import { Future, Option, Result } from 'sakiko';
 import { detectPMByLock } from './pm';
 import type { PM, PnpmWorkspaceYaml } from './types';
 
-export function resolve(lastResult: string, ...args: string[]): Result<string> {
-    const result = path.resolve(lastResult, ...args);
-    if (lastResult === result) {
+export function resolve(input: string, ...args: string[]): Result<string> {
+    const result = path.resolve(input, ...args);
+    if (path.normalize(input) === path.normalize(result)) {
         return Result.err(new Error('Could not resolve path'));
     }
     return Result.ok(result);
@@ -48,7 +48,6 @@ export function readConfig(root: string): Future<{
             }
             throw new Error('Invalid pnpm-workspace.yaml');
         }
-
         const pkg = await readPackage({ cwd: root });
         const globs = parseWorkspaceOption(pkg).unwrap();
         const pm = detectPMByLock(root).unwrap();
