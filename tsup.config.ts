@@ -12,5 +12,5 @@ export default defineConfig({
                 const require = createRequire(import.meta.url);`,
             };
     },
-    platform: 'node'
+    platform: 'node',
 });

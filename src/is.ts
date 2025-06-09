@@ -48,9 +48,11 @@ export function isInMonorepo(
         if (!config) {
             return false;
         }
-        const packageDirs = await findPackages(root).then((packages) => {
-            return packages.map((p) => p.rootDir + path.sep);
-        });
+        const packageDirs = await findPackages(root)
+            .then((packages) => {
+                return packages.map((p) => p.rootDir + path.sep);
+            })
+            .then((dirs) => dirs.map(path.normalize));
         const globResults = await glob(config, {
             cwd: root,
             onlyDirectories: true,

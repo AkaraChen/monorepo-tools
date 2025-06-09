@@ -13,7 +13,7 @@ test('is workspace in monorepo', async () => {
     expect(
         await isInMonorepo(
             pnpmFixture,
-            path.join(pnpmFixture, 'packages', 'pkg1'),
+            path.join(pnpmFixture, 'packages', 'pnpm-pkg-1'),
         ),
     ).toBe(true);
     expect(await isInMonorepo(pnpmFixture, yarnFixture)).toBe(false);
@@ -21,7 +21,7 @@ test('is workspace in monorepo', async () => {
     expect(
         await isInMonorepo(
             yarnFixture,
-            path.join(yarnFixture, 'packages', 'pkg1'),
+            path.join(yarnFixture, 'packages', 'yarn-pkg-1'),
         ),
     ).toBe(true);
     expect(await isInMonorepo(yarnFixture, pnpmFixture)).toBe(false);
