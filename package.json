@@ -7,6 +7,9 @@
         "build": "tsup",
         "check": "biome check . --apply",
         "doc": "typedoc src/index.ts --plugin typedoc-material-theme  --themeColor '#1C6EF3'",
+        "knip": "knip",
+        "generate-fixtures": "tsx scripts/generate-fixtures.ts",
+        "bench": "vitest bench"
         "knip": "knip"
     },
     "keywords": [],
@@ -29,6 +32,7 @@
         "tinyglobby": "^0.2.14",
         "tslib": "^2.8.1",
         "tsup": "^8.5.0",
+        "tsx": "^4.20.6",
         "typedoc": "^0.28.5",
         "typedoc-material-theme": "^1.4.0",
         "typescript": "^5.8.3",

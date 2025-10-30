@@ -15,7 +15,9 @@ export function resolve(input: string, ...args: string[]): Result<string> {
     return Result.ok(result);
 }
 
-function parseWorkspaceOption(packageJson: PackageJson): Option<string[]> {
+export function parseWorkspaceOption(
+    packageJson: PackageJson,
+): Option<string[]> {
     if (packageJson.workspaces) {
         const workspaces = packageJson.workspaces;
         const workspaceDirs = Array.isArray(workspaces)
@@ -44,7 +46,7 @@ export function readConfig(root: string): Future<{
         if (pnpm.isOk()) {
             const globs = pnpm.unwrap().packages;
             if (globs) {
-                return { pm: 'pnpm', globs };
+                return { pm: 'pnpm' as PM, globs };
             }
             throw new Error('Invalid pnpm-workspace.yaml');
         }
