@@ -1,0 +1,4 @@
+{
+    "name": "deno-pkg-1",
+    "packageManager": "deno@1.0.0"
+}

@@ -10,7 +10,7 @@ import type { PM } from './types';
  */
 export function detectPMByUA(): Option<PM> {
     const packageManager = process.env.npm_config_user_agent || '';
-    for (const key of ['npm', 'pnpm', 'yarn'] as const) {
+    for (const key of ['npm', 'pnpm', 'yarn', 'bun', 'deno'] as const) {
         if (packageManager.startsWith(key)) {
             return Option.some(key);
         }
@@ -30,6 +30,8 @@ export function detectPMByLock(searchDir: string): Option<PM> {
         'pnpm-lock.yaml': 'pnpm',
         'yarn.lock': 'yarn',
         'package-lock.json': 'npm',
+        'bun.lockb': 'bun',
+        'deno.lock': 'deno',
     };
     for (const [file, pm] of Object.entries(map)) {
         if (existsSync(path.join(dir, file))) {
