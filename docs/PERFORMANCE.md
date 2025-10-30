@@ -44,24 +44,6 @@ This will benchmark all major functions across all fixture types and sizes.
 - Medium repos: 4.14x faster (3.27ms → 0.79ms)
 - Large repos: 4.49x faster (10.60ms → 2.37ms)
 
-### 2. Config Caching
-
-**Problem**: `readConfig()` was called multiple times for the same root directory, causing redundant I/O operations.
-
-**Solution**: Added a simple in-memory cache (Map) to store config results by normalized root path.
-
-**Additional Performance Improvement**:
-- Small repos: 1.72x faster (0.50ms → 0.29ms)
-- Medium repos: 1.35x faster (0.79ms → 0.59ms)
-- Large repos: 1.08x faster (2.37ms → 2.19ms)
-
-### Combined Impact
-
-**Total isInMonorepo improvement** from baseline:
-- Small repos: **5.95x faster** (1.73ms → 0.29ms)
-- Medium repos: **5.58x faster** (3.27ms → 0.59ms)
-- Large repos: **4.85x faster** (10.60ms → 2.19ms)
-
 ## Benchmark Results Summary
 
 ### Before Optimizations
@@ -79,9 +61,9 @@ This will benchmark all major functions across all fixture types and sizes.
 
 | Function | Package Manager | Size | Time (ms) | Improvement |
 |----------|----------------|------|-----------|-------------|
-| isInMonorepo | pnpm | small | 0.29 | 5.95x |
-| isInMonorepo | pnpm | medium | 0.59 | 5.58x |
-| isInMonorepo | pnpm | large | 2.19 | 4.85x |
+| isInMonorepo | pnpm | small | 0.50 | 3.45x |
+| isInMonorepo | pnpm | medium | 0.79 | 4.14x |
+| isInMonorepo | pnpm | large | 2.37 | 4.49x |
 | scanProjects | pnpm | small | 2.05 | 2.61x |
 | scanProjects | pnpm | medium | 2.56 | 2.56x |
 | scanProjects | pnpm | large | 7.62 | 2.65x |
