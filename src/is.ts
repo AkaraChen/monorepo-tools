@@ -58,11 +58,15 @@ export function isInMonorepo(
             absolute: true,
         });
         // Normalize paths and remove trailing slashes for comparison
-        const normalizedWorkspaceDir = path.normalize(workspaceDir).replace(/[/\\]+$/, '');
+        const normalizedWorkspaceDir = path
+            .normalize(workspaceDir)
+            .replace(/[/\\]+$/, '');
         // Check if workspaceDir matches any of the glob results
         // or is a subdirectory of a glob result
         for (const result of globResults) {
-            const normalizedResult = path.normalize(result).replace(/[/\\]+$/, '');
+            const normalizedResult = path
+                .normalize(result)
+                .replace(/[/\\]+$/, '');
             if (
                 normalizedWorkspaceDir === normalizedResult ||
                 normalizedWorkspaceDir.startsWith(normalizedResult + path.sep)

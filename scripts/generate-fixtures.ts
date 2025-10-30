@@ -29,7 +29,11 @@ async function ensureDir(dir: string) {
     }
 }
 
-async function generatePackageJson(name: string, isRoot = false, workspaces?: string[]) {
+async function generatePackageJson(
+    name: string,
+    isRoot = false,
+    workspaces?: string[],
+) {
     const pkg: Record<string, unknown> = {
         name,
         version: '1.0.0',
@@ -90,9 +94,14 @@ async function generatePnpmFixture(config: FixtureConfig) {
     }
 
     // Create empty lock file
-    await writeFile(path.join(rootDir, 'pnpm-lock.yaml'), 'lockfileVersion: \'6.0\'\n');
+    await writeFile(
+        path.join(rootDir, 'pnpm-lock.yaml'),
+        "lockfileVersion: '6.0'\n",
+    );
 
-    console.log(`✓ Generated pnpm fixture (${size}) with ${numPackages} packages at ${rootDir}`);
+    console.log(
+        `✓ Generated pnpm fixture (${size}) with ${numPackages} packages at ${rootDir}`,
+    );
 }
 
 async function generateYarnFixture(config: FixtureConfig) {
@@ -104,7 +113,9 @@ async function generateYarnFixture(config: FixtureConfig) {
     await ensureDir(path.join(rootDir, 'packages'));
 
     // Generate root package.json with workspaces
-    const rootPkg = await generatePackageJson('yarn-workspace-root', true, ['packages/*']);
+    const rootPkg = await generatePackageJson('yarn-workspace-root', true, [
+        'packages/*',
+    ]);
     await writeFile(path.join(rootDir, 'package.json'), rootPkg);
 
     // Generate packages
@@ -126,7 +137,9 @@ async function generateYarnFixture(config: FixtureConfig) {
     // Create empty lock file
     await writeFile(path.join(rootDir, 'yarn.lock'), '# yarn lockfile v1\n');
 
-    console.log(`✓ Generated yarn fixture (${size}) with ${numPackages} packages at ${rootDir}`);
+    console.log(
+        `✓ Generated yarn fixture (${size}) with ${numPackages} packages at ${rootDir}`,
+    );
 }
 
 async function generateNpmFixture(config: FixtureConfig) {
@@ -138,7 +151,9 @@ async function generateNpmFixture(config: FixtureConfig) {
     await ensureDir(path.join(rootDir, 'packages'));
 
     // Generate root package.json with workspaces
-    const rootPkg = await generatePackageJson('npm-workspace-root', true, ['packages/*']);
+    const rootPkg = await generatePackageJson('npm-workspace-root', true, [
+        'packages/*',
+    ]);
     await writeFile(path.join(rootDir, 'package.json'), rootPkg);
 
     // Generate packages
@@ -163,11 +178,18 @@ async function generateNpmFixture(config: FixtureConfig) {
         JSON.stringify({ lockfileVersion: 3 }, null, 2),
     );
 
-    console.log(`✓ Generated npm fixture (${size}) with ${numPackages} packages at ${rootDir}`);
+    console.log(
+        `✓ Generated npm fixture (${size}) with ${numPackages} packages at ${rootDir}`,
+    );
 }
 
 async function generateFixtures() {
-    const outputDir = path.join(process.cwd(), 'test', 'fixture', 'performance');
+    const outputDir = path.join(
+        process.cwd(),
+        'test',
+        'fixture',
+        'performance',
+    );
     await ensureDir(outputDir);
 
     const pms: PM[] = ['pnpm', 'yarn', 'npm'];
@@ -176,7 +198,7 @@ async function generateFixtures() {
     for (const pm of pms) {
         for (const size of sizes) {
             const config: FixtureConfig = { pm, size, outputDir };
-            
+
             if (pm === 'pnpm') {
                 await generatePnpmFixture(config);
             } else if (pm === 'yarn') {

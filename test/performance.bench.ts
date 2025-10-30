@@ -1,14 +1,10 @@
-import { bench, describe } from 'vitest';
 import path from 'pathe';
-import { scanProjects, findUpRoot } from '../src/find';
-import { detectPM } from '../src/pm';
+import { bench, describe } from 'vitest';
+import { findUpRoot, scanProjects } from '../src/find';
 import { isInMonorepo } from '../src/is';
+import { detectPM } from '../src/pm';
 
-const performanceFixtureDir = path.join(
-    __dirname,
-    'fixture',
-    'performance',
-);
+const performanceFixtureDir = path.join(__dirname, 'fixture', 'performance');
 
 type PM = 'pnpm' | 'yarn' | 'npm';
 type Size = 'small' | 'medium' | 'large';
