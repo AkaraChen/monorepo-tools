@@ -10,6 +10,7 @@
         "knip": "knip",
         "generate-fixtures": "tsx scripts/generate-fixtures.ts",
         "bench": "vitest bench"
+        "knip": "knip"
     },
     "keywords": [],
     "author": "",
