@@ -31,6 +31,7 @@ export function detectPMByLock(searchDir: string): Option<PM> {
         'yarn.lock': 'yarn',
         'package-lock.json': 'npm',
         'bun.lockb': 'bun',
+        'bun.lock': 'bun',
         'deno.lock': 'deno',
     };
     for (const [file, pm] of Object.entries(map)) {

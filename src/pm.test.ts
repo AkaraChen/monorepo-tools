@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { bunFixture, denoFixture, pnpmFixture } from '../test';
+import { bunFixture, bunJsonFixture, denoFixture, pnpmFixture } from '../test';
 import { detectPMByLock, detectPMByUA } from './pm';
 
 test('get by lockfile', async () => {
@@ -15,6 +15,11 @@ test('get by user agent', () => {
 
 test('detect bun by lockfile', async () => {
     const pm = detectPMByLock(bunFixture);
+    expect(pm.unwrap()).toBe('bun');
+});
+
+test('detect bun by json lockfile', async () => {
+    const pm = detectPMByLock(bunJsonFixture);
     expect(pm.unwrap()).toBe('bun');
 });
 
