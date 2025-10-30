@@ -15,7 +15,9 @@ export function resolve(input: string, ...args: string[]): Result<string> {
     return Result.ok(result);
 }
 
-function parseWorkspaceOption(packageJson: PackageJson): Option<string[]> {
+export function parseWorkspaceOption(
+    packageJson: PackageJson,
+): Option<string[]> {
     if (packageJson.workspaces) {
         const workspaces = packageJson.workspaces;
         const workspaceDirs = Array.isArray(workspaces)

@@ -9,9 +9,9 @@ import path from 'pathe';
 import { readPackageUp } from 'read-package-up';
 import { readPackage } from 'read-pkg';
 import { Future } from 'sakiko';
-import { isInMonorepo } from './is';
+import { isInMonorepo, isInWorkspace } from './is';
 import type { PM } from './types';
-import { readConfig, resolve } from './utils';
+import { parseWorkspaceOption, readConfig, resolve } from './utils';
 
 /**
  * Finds the root directory of a monorepo or workspace based on the provided search directory and package manager.
@@ -52,7 +52,10 @@ export function findUpRoot(
             if (!pkg) throw new Error('No package.json root found');
             cwd = path.dirname(pkg.path);
             if (pkg.packageJson.workspaces) {
-                const isRoot = await isInMonorepo(cwd, searchDir);
+                // Instead of calling isInMonorepo (which calls readConfig),
+                // use the workspace info we already have
+                const globs = parseWorkspaceOption(pkg.packageJson).unwrap();
+                const isRoot = await isInWorkspace(cwd, searchDir, globs);
                 if (isRoot) return cwd;
                 throw new Error('This directory is not in the workspace');
             }
