@@ -1,15 +1,14 @@
 {
     "name": "@akrc/monorepo-tools",
-    "version": "4.1.0",
+    "version": "5.0.0",
     "description": "",
     "scripts": {
         "test": "vitest run",
         "build": "tsup",
         "check": "biome check . --apply",
         "doc": "typedoc src/index.ts --plugin typedoc-material-theme  --themeColor '#1C6EF3'",
-        "knip": "knip",
         "generate-fixtures": "tsx scripts/generate-fixtures.ts",
-        "bench": "vitest bench"
+        "bench": "vitest bench",
         "knip": "knip"
     },
     "keywords": [],
