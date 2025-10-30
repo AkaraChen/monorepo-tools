@@ -1,6 +1,4 @@
 import { existsSync } from 'node:fs';
-import { findPackages } from '@pnpm/fs.find-packages';
-import type { ProjectRootDir } from '@pnpm/types';
 import path from 'pathe';
 import { readPackage } from 'read-pkg';
 import { Future } from 'sakiko';
@@ -44,22 +42,34 @@ export function isInMonorepo(
         if (relative.startsWith('..')) {
             return false;
         }
+        // If checking the root itself, it's always in the monorepo
+        if (relative === '') {
+            return true;
+        }
         const { globs: config } = await readConfig(root);
         if (!config) {
             return false;
         }
-        const packageDirs = await findPackages(root)
-            .then((packages) => {
-                return packages.map((p) => p.rootDir + path.sep);
-            })
-            .then((dirs) => dirs.map(path.normalize));
+        // Optimization: Use glob to find matching directories directly
+        // instead of scanning all packages first
         const globResults = await glob(config, {
             cwd: root,
             onlyDirectories: true,
             absolute: true,
         });
-        return globResults.some((dir) =>
-            packageDirs.includes(dir as ProjectRootDir),
-        );
+        // Normalize paths and remove trailing slashes for comparison
+        const normalizedWorkspaceDir = path.normalize(workspaceDir).replace(/[/\\]+$/, '');
+        // Check if workspaceDir matches any of the glob results
+        // or is a subdirectory of a glob result
+        for (const result of globResults) {
+            const normalizedResult = path.normalize(result).replace(/[/\\]+$/, '');
+            if (
+                normalizedWorkspaceDir === normalizedResult ||
+                normalizedWorkspaceDir.startsWith(normalizedResult + path.sep)
+            ) {
+                return true;
+            }
+        }
+        return false;
     });
 }
