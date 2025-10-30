@@ -7,6 +7,9 @@ import { Future, Option, Result } from 'sakiko';
 import { detectPMByLock } from './pm';
 import type { PM, PnpmWorkspaceYaml } from './types';
 
+// Simple cache for config results
+const configCache = new Map<string, { pm: PM; globs: string[] }>();
+
 export function resolve(input: string, ...args: string[]): Result<string> {
     const result = path.resolve(input, ...args);
     if (path.normalize(input) === path.normalize(result)) {
@@ -40,18 +43,29 @@ export function readConfig(root: string): Future<{
     globs: string[];
 }> {
     return Future.from(async () => {
+        // Check cache first
+        const normalizedRoot = path.normalize(root);
+        const cached = configCache.get(normalizedRoot);
+        if (cached) {
+            return cached;
+        }
+
         const pnpm = await readPnpmWorkspaceYaml(root).result();
         if (pnpm.isOk()) {
             const globs = pnpm.unwrap().packages;
             if (globs) {
-                return { pm: 'pnpm', globs };
+                const config = { pm: 'pnpm' as PM, globs };
+                configCache.set(normalizedRoot, config);
+                return config;
             }
             throw new Error('Invalid pnpm-workspace.yaml');
         }
         const pkg = await readPackage({ cwd: root });
         const globs = parseWorkspaceOption(pkg).unwrap();
         const pm = detectPMByLock(root).unwrap();
-        return { pm, globs };
+        const config = { pm, globs };
+        configCache.set(normalizedRoot, config);
+        return config;
     });
 }
 
