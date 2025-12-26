@@ -27,9 +27,9 @@ test('test find in pnpm sub workspace', async () => {
     );
     const pkg1 = projects.at(0);
     if (!pkg1) throw new Error('pkg1 not found');
-    expect(
-        await findUpRoot(pkg1.rootDir, detectPM(pkg1.rootDir).unwrap()),
-    ).toBe(pnpmFixture);
+    expect(await findUpRoot(pkg1.rootDir, detectPM(pnpmFixture).unwrap())).toBe(
+        pnpmFixture,
+    );
 });
 
 test('test find in yarn root workspace', async () => {

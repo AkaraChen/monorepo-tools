@@ -1,3 +1,4 @@
+import { realpath, writeFile } from 'node:fs/promises';
 import { findPackages } from '@pnpm/fs.find-packages';
 import type {
     Project,
@@ -9,9 +10,53 @@ import path from 'pathe';
 import { readPackageUp } from 'read-package-up';
 import { readPackage } from 'read-pkg';
 import { Future } from 'sakiko';
+import { glob } from 'tinyglobby';
 import { isInMonorepo, isInWorkspace } from './is';
 import type { PM } from './types';
 import { parseWorkspaceOption, readConfig, resolve } from './utils';
+
+/**
+ * Finds all packages in a workspace by searching for package.json files matching the given glob patterns.
+ * @param root The root directory of the workspace.
+ * @param globs The glob patterns to search for packages (e.g., ['packages/*']).
+ * @returns An array of Project objects found in the workspace.
+ */
+async function findPackagesInWorkspace(
+    root: string,
+    globs: string[],
+): Promise<Project[]> {
+    // Convert globs to package.json search patterns
+    const patterns = globs.map((g) =>
+        path.join(root, g, 'package.json').replace(/\\/g, '/'),
+    );
+
+    // Find all package.json files, excluding node_modules and bower_components
+    const packageJsonPaths = await glob(patterns, {
+        ignore: ['**/node_modules/**', '**/bower_components/**'],
+        absolute: true,
+        onlyFiles: true,
+    });
+
+    // Read each package.json and create Project objects
+    const projects = await Promise.all(
+        packageJsonPaths.map(async (manifestPath) => {
+            const rootDir = path.dirname(manifestPath);
+            const rootDirRealPath = await realpath(rootDir);
+            const manifest = await readPackage({ cwd: rootDir });
+
+            return {
+                rootDir: rootDir as ProjectRootDir,
+                rootDirRealPath: rootDirRealPath as ProjectRootDirRealPath,
+                manifest,
+                writeProjectManifest: () => {
+                    throw new Error('Not implemented');
+                },
+            } as Project;
+        }),
+    );
+
+    return projects;
+}
 
 /**
  * Finds the root directory of a monorepo or workspace based on the provided search directory and package manager.
@@ -85,12 +130,7 @@ export function scanProjects(
         if (!globs) {
             throw new Error('No workspace root found');
         }
-        const results = await Promise.all(
-            globs.map((d) => {
-                const dir = path.join(root, d).replaceAll('*', '');
-                return findPackages(dir);
-            }),
-        ).then((r) => r.flat());
+        const results = await findPackagesInWorkspace(root, globs);
         // yarn/npm workspaces seems can't find the root package, so add it manually
         results.push({
             rootDir: root as ProjectRootDir,

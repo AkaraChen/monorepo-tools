@@ -130,7 +130,12 @@ describe('findRepoRoot performance', () => {
         'findRepoRoot - from nested directory',
         async () => {
             // Test from a deeply nested directory
-            const nestedDir = path.join(__dirname, 'fixture', 'pnpm', 'packages');
+            const nestedDir = path.join(
+                __dirname,
+                'fixture',
+                'pnpm',
+                'packages',
+            );
             await findRepoRoot(nestedDir);
         },
         {
