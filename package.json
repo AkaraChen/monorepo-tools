@@ -1,6 +1,6 @@
 {
     "name": "@akrc/monorepo-tools",
-    "version": "5.1.2",
+    "version": "5.1.3",
     "description": "",
     "scripts": {
         "test": "vitest run",
