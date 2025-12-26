@@ -21,31 +21,33 @@
         "@pnpm/fs.find-packages": "^4.0.2",
         "@pnpm/types": "^12.2.0",
         "@types/js-yaml": "^4.0.9",
-        "@types/node": "^22.15.30",
-        "find-up": "^7.0.0",
-        "knip": "^5.60.2",
+        "@types/node": "^25.0.3",
+        "find-up": "^8.0.0",
+        "knip": "^5.77.1",
         "pathe": "^2.0.3",
-        "read-package-up": "^11.0.0",
-        "read-pkg": "^9.0.1",
+        "read-package-up": "^12.0.0",
+        "read-pkg": "^10.0.0",
         "sakiko": "^1.5.0",
-        "tinyglobby": "^0.2.14",
+        "tinyglobby": "^0.2.15",
         "tslib": "^2.8.1",
-        "tsup": "^8.5.0",
-        "tsx": "^4.20.6",
-        "typedoc": "^0.28.5",
-        "typedoc-material-theme": "^1.4.0",
-        "typescript": "^5.8.3",
-        "vitest": "^3.2.2"
+        "tsup": "^8.5.1",
+        "tsx": "^4.21.0",
+        "typedoc": "^0.28.15",
+        "typedoc-material-theme": "^1.4.1",
+        "typescript": "^5.9.3",
+        "vitest": "^4.0.16"
     },
     "module": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "type": "module",
-    "files": ["./dist"],
+    "files": [
+        "./dist"
+    ],
     "exports": {
         "types": "./dist/index.d.ts",
         "import": "./dist/index.js"
     },
-    "packageManager": "pnpm@10.11.1",
+    "packageManager": "pnpm@10.26.2",
     "pnpm": {
         "overrides": {
             "@pnpm/fs.find-packages": "4.0.2",
