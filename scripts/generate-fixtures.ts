@@ -9,13 +9,17 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'pathe';
 
 type PM = 'pnpm' | 'yarn' | 'npm';
-type Size = 'small' | 'medium' | 'large';
+type Size = 'tiny' | 'small' | 'medium' | 'large' | 'massive';
 
 const SIZES = {
-    small: 5,
-    medium: 20,
-    large: 100,
+    tiny: 10,
+    small: 50,
+    medium: 200,
+    large: 500,
+    massive: 2000,
 } as const;
+
+const BATCH_SIZE = 100; // 每批并行生成的包数量
 
 interface FixtureConfig {
     pm: PM;
@@ -61,6 +65,22 @@ async function generatePnpmWorkspace(patterns: string[]) {
     return `packages:\n${patterns.map((p) => `  - '${p}'`).join('\n')}\n`;
 }
 
+async function generatePackageBatch(
+    packages: Array<{ name: string; dir: string }>,
+) {
+    await Promise.all(
+        packages.map(async ({ name, dir }) => {
+            await ensureDir(dir);
+            const pkg = await generatePackageJson(`@workspace/${name}`, false);
+            await writeFile(path.join(dir, 'package.json'), pkg);
+            await writeFile(
+                path.join(dir, 'index.js'),
+                `module.exports = { name: '${name}' };\n`,
+            );
+        }),
+    );
+}
+
 async function generatePnpmFixture(config: FixtureConfig) {
     const { size, outputDir } = config;
     const numPackages = SIZES[size];
@@ -77,20 +97,20 @@ async function generatePnpmFixture(config: FixtureConfig) {
     const workspace = await generatePnpmWorkspace(['packages/*']);
     await writeFile(path.join(rootDir, 'pnpm-workspace.yaml'), workspace);
 
-    // Generate packages
+    // Generate packages in batches for better performance
+    const packages: Array<{ name: string; dir: string }> = [];
     for (let i = 0; i < numPackages; i++) {
         const pkgName = `pnpm-pkg-${i + 1}`;
-        const pkgDir = path.join(rootDir, 'packages', pkgName);
-        await ensureDir(pkgDir);
+        packages.push({
+            name: pkgName,
+            dir: path.join(rootDir, 'packages', pkgName),
+        });
+    }
 
-        const pkg = await generatePackageJson(`@workspace/${pkgName}`, false);
-        await writeFile(path.join(pkgDir, 'package.json'), pkg);
-
-        // Create a dummy index.js
-        await writeFile(
-            path.join(pkgDir, 'index.js'),
-            `module.exports = { name: '${pkgName}' };\n`,
-        );
+    // Process in batches
+    for (let i = 0; i < packages.length; i += BATCH_SIZE) {
+        const batch = packages.slice(i, i + BATCH_SIZE);
+        await generatePackageBatch(batch);
     }
 
     // Create empty lock file
@@ -118,20 +138,19 @@ async function generateYarnFixture(config: FixtureConfig) {
     ]);
     await writeFile(path.join(rootDir, 'package.json'), rootPkg);
 
-    // Generate packages
+    // Generate packages in batches
+    const packages: Array<{ name: string; dir: string }> = [];
     for (let i = 0; i < numPackages; i++) {
         const pkgName = `yarn-pkg-${i + 1}`;
-        const pkgDir = path.join(rootDir, 'packages', pkgName);
-        await ensureDir(pkgDir);
+        packages.push({
+            name: pkgName,
+            dir: path.join(rootDir, 'packages', pkgName),
+        });
+    }
 
-        const pkg = await generatePackageJson(`@workspace/${pkgName}`, false);
-        await writeFile(path.join(pkgDir, 'package.json'), pkg);
-
-        // Create a dummy index.js
-        await writeFile(
-            path.join(pkgDir, 'index.js'),
-            `module.exports = { name: '${pkgName}' };\n`,
-        );
+    for (let i = 0; i < packages.length; i += BATCH_SIZE) {
+        const batch = packages.slice(i, i + BATCH_SIZE);
+        await generatePackageBatch(batch);
     }
 
     // Create empty lock file
@@ -156,20 +175,19 @@ async function generateNpmFixture(config: FixtureConfig) {
     ]);
     await writeFile(path.join(rootDir, 'package.json'), rootPkg);
 
-    // Generate packages
+    // Generate packages in batches
+    const packages: Array<{ name: string; dir: string }> = [];
     for (let i = 0; i < numPackages; i++) {
         const pkgName = `npm-pkg-${i + 1}`;
-        const pkgDir = path.join(rootDir, 'packages', pkgName);
-        await ensureDir(pkgDir);
+        packages.push({
+            name: pkgName,
+            dir: path.join(rootDir, 'packages', pkgName),
+        });
+    }
 
-        const pkg = await generatePackageJson(`@workspace/${pkgName}`, false);
-        await writeFile(path.join(pkgDir, 'package.json'), pkg);
-
-        // Create a dummy index.js
-        await writeFile(
-            path.join(pkgDir, 'index.js'),
-            `module.exports = { name: '${pkgName}' };\n`,
-        );
+    for (let i = 0; i < packages.length; i += BATCH_SIZE) {
+        const batch = packages.slice(i, i + BATCH_SIZE);
+        await generatePackageBatch(batch);
     }
 
     // Create empty lock file
@@ -193,11 +211,14 @@ async function generateFixtures() {
     await ensureDir(outputDir);
 
     const pms: PM[] = ['pnpm', 'yarn', 'npm'];
-    const sizes: Size[] = ['small', 'medium', 'large'];
+    const sizes: Size[] = ['tiny', 'small', 'medium', 'large', 'massive'];
+
+    console.log('Generating performance test fixtures...\n');
 
     for (const pm of pms) {
         for (const size of sizes) {
             const config: FixtureConfig = { pm, size, outputDir };
+            const startTime = Date.now();
 
             if (pm === 'pnpm') {
                 await generatePnpmFixture(config);
@@ -206,6 +227,9 @@ async function generateFixtures() {
             } else if (pm === 'npm') {
                 await generateNpmFixture(config);
             }
+
+            const elapsed = Date.now() - startTime;
+            console.log(`  (generated in ${elapsed}ms)\n`);
         }
     }
 
