@@ -64,7 +64,7 @@ export class LRUCache<T> {
 // Global cache instances
 export const globResultCache = new LRUCache<string[]>(50, 10000);
 export const packageJsonCache = new LRUCache<Record<string, unknown>>(
-    200,
+    2500, // Support large monorepos (2000+ packages)
     5000,
 );
 export const configCache = new LRUCache<{ pm: string; globs: string[] }>(

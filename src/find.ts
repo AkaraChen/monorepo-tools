@@ -1,7 +1,7 @@
-import { realpath } from 'node:fs/promises';
 import path from 'pathe';
 import { Future } from 'sakiko';
 import { glob } from 'tinyglobby';
+import { globResultCache } from './cache';
 import { isInMonorepo, isInWorkspace } from './is';
 import type { PM, Project } from './types';
 import { parseWorkspaceOption, readConfig, resolve } from './utils';
@@ -25,23 +25,26 @@ async function findPackagesInWorkspace(
         path.join(root, g, 'package.json').replace(/\\/g, '/'),
     );
 
-    // Find all package.json files, excluding node_modules and bower_components
-    const packageJsonPaths = await glob(patterns, {
-        ignore: ['**/node_modules/**', '**/bower_components/**'],
-        absolute: true,
-        onlyFiles: true,
-    });
+    // Find all package.json files with caching
+    const cacheKey = `pkg:${root}:${patterns.join(',')}`;
+    let packageJsonPaths = globResultCache.get(cacheKey);
+    if (!packageJsonPaths) {
+        packageJsonPaths = await glob(patterns, {
+            ignore: ['**/node_modules/**', '**/bower_components/**'],
+            absolute: true,
+            onlyFiles: true,
+        });
+        globResultCache.set(cacheKey, packageJsonPaths);
+    }
 
-    // Read each package.json and create Project objects
+    // Read each package.json and create Project objects (uses packageJsonCache)
     const projects = await Promise.all(
         packageJsonPaths.map(async (manifestPath) => {
             const rootDir = path.dirname(manifestPath);
-            const rootDirRealPath = await realpath(rootDir);
             const manifest = await readPackage({ cwd: rootDir });
 
             return {
                 rootDir,
-                rootDirRealPath,
                 manifest,
             } as Project;
         }),
