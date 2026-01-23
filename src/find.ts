@@ -1,19 +1,14 @@
-import { realpath, writeFile } from 'node:fs/promises';
-import { findPackages } from '@pnpm/fs.find-packages';
-import type {
-    Project,
-    ProjectRootDir,
-    ProjectRootDirRealPath,
-} from '@pnpm/types';
-import { findUp } from './vendor/find-up';
+import { realpath } from 'node:fs/promises';
 import path from 'pathe';
-import { readPackageUp } from './vendor/read-package-up';
-import { readPackage } from './vendor/read-pkg';
 import { Future } from 'sakiko';
 import { glob } from 'tinyglobby';
 import { isInMonorepo, isInWorkspace } from './is';
-import type { PM } from './types';
+import type { PM, Project } from './types';
 import { parseWorkspaceOption, readConfig, resolve } from './utils';
+import { findPackages } from './vendor/find-packages';
+import { findUp } from './vendor/find-up';
+import { readPackageUp } from './vendor/read-package-up';
+import { readPackage } from './vendor/read-pkg';
 
 /**
  * Finds all packages in a workspace by searching for package.json files matching the given glob patterns.
@@ -45,12 +40,9 @@ async function findPackagesInWorkspace(
             const manifest = await readPackage({ cwd: rootDir });
 
             return {
-                rootDir: rootDir as ProjectRootDir,
-                rootDirRealPath: rootDirRealPath as ProjectRootDirRealPath,
+                rootDir,
+                rootDirRealPath,
                 manifest,
-                writeProjectManifest: () => {
-                    throw new Error('Not implemented');
-                },
             } as Project;
         }),
     );
@@ -133,15 +125,9 @@ export function scanProjects(
         const results = await findPackagesInWorkspace(root, globs);
         // yarn/npm workspaces seems can't find the root package, so add it manually
         results.push({
-            rootDir: root as ProjectRootDir,
-            rootDirRealPath: root as ProjectRootDirRealPath,
-            manifest: {
-                ...(await readPackage({ cwd: root })),
-            },
-            writeProjectManifest: () => {
-                throw new Error('Not implemented');
-            },
-        } as Project);
+            rootDir: root,
+            manifest: await readPackage({ cwd: root }),
+        });
         return results;
     });
 }
