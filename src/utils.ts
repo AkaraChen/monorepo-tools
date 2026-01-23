@@ -2,10 +2,10 @@ import { readFile } from 'node:fs/promises';
 import * as yaml from '@akrc/yaml';
 import path from 'pathe';
 import { Future, Option, Result } from 'sakiko';
-import type { PackageJson } from './types';
-import { readPackage } from './vendor/read-pkg';
+import { configCache } from './cache';
 import { detectPMByLock } from './pm';
-import type { PM, PnpmWorkspaceYaml } from './types';
+import type { PM, PackageJson, PnpmWorkspaceYaml } from './types';
+import { readPackage } from './vendor/read-pkg';
 
 export function resolve(input: string, ...args: string[]): Result<string> {
     const result = path.resolve(input, ...args);
@@ -42,18 +42,32 @@ export function readConfig(root: string): Future<{
     globs: string[];
 }> {
     return Future.from(async () => {
+        // Check cache first
+        const cached = configCache.get(root);
+        if (cached) {
+            return cached as { pm: PM; globs: string[] };
+        }
+
+        let result: { pm: PM; globs: string[] };
+
         const pnpm = await readPnpmWorkspaceYaml(root).result();
         if (pnpm.isOk()) {
             const globs = pnpm.unwrap().packages;
             if (globs) {
-                return { pm: 'pnpm' as PM, globs };
+                result = { pm: 'pnpm' as PM, globs };
+            } else {
+                throw new Error('Invalid pnpm-workspace.yaml');
             }
-            throw new Error('Invalid pnpm-workspace.yaml');
+        } else {
+            const pkg = await readPackage({ cwd: root });
+            const globs = parseWorkspaceOption(pkg).unwrap();
+            const pm = detectPMByLock(root).unwrap();
+            result = { pm, globs };
         }
-        const pkg = await readPackage({ cwd: root });
-        const globs = parseWorkspaceOption(pkg).unwrap();
-        const pm = detectPMByLock(root).unwrap();
-        return { pm, globs };
+
+        // Cache the result
+        configCache.set(root, result);
+        return result;
     });
 }
 

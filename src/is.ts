@@ -1,9 +1,10 @@
 import { existsSync } from 'node:fs';
 import path from 'pathe';
-import { readPackage } from './vendor/read-pkg';
 import { Future } from 'sakiko';
 import { glob } from 'tinyglobby';
+import { globResultCache } from './cache';
 import { readConfig } from './utils';
+import { readPackage } from './vendor/read-pkg';
 
 /**
  * Checks if the specified directory is the root of a monorepo.
@@ -48,12 +49,18 @@ export async function isInWorkspace(
     if (relative === '') {
         return true;
     }
-    // Use glob to find matching directories directly
-    const globResults = await glob(globs, {
-        cwd: root,
-        onlyDirectories: true,
-        absolute: true,
-    });
+    // Use glob to find matching directories directly (with caching)
+    const cacheKey = `${root}:${globs.join(',')}`;
+    let globResults = globResultCache.get(cacheKey);
+
+    if (!globResults) {
+        globResults = await glob(globs, {
+            cwd: root,
+            onlyDirectories: true,
+            absolute: true,
+        });
+        globResultCache.set(cacheKey, globResults);
+    }
     // Normalize paths and remove trailing slashes for comparison
     const normalizedWorkspaceDir = path
         .normalize(workspaceDir)

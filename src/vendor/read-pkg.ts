@@ -1,9 +1,7 @@
-import { readFile, readFileSync } from 'node:fs';
-import { promisify } from 'node:util';
+import { readFile } from 'node:fs/promises';
 import path from 'pathe';
+import { packageJsonCache } from '../cache';
 import type { PackageJson } from '../types';
-
-const readFileAsync = promisify(readFile);
 
 export interface ReadPackageOptions {
     cwd?: string;
@@ -14,13 +12,18 @@ export async function readPackage(
 ): Promise<PackageJson> {
     const cwd = options.cwd ?? process.cwd();
     const filePath = path.join(cwd, 'package.json');
-    const content = await readFileAsync(filePath, 'utf-8');
-    return JSON.parse(content) as PackageJson;
-}
 
-export function readPackageSync(options: ReadPackageOptions = {}): PackageJson {
-    const cwd = options.cwd ?? process.cwd();
-    const filePath = path.join(cwd, 'package.json');
-    const content = readFileSync(filePath, 'utf-8');
-    return JSON.parse(content) as PackageJson;
+    // Check cache first
+    const cached = packageJsonCache.get(filePath);
+    if (cached) {
+        return cached as PackageJson;
+    }
+
+    const content = await readFile(filePath, 'utf-8');
+    const pkg = JSON.parse(content) as PackageJson;
+
+    // Cache the result
+    packageJsonCache.set(filePath, pkg);
+
+    return pkg;
 }
