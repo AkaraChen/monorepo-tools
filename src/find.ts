@@ -1,7 +1,5 @@
 import path from 'pathe';
 import { Future } from 'sakiko';
-import { glob } from 'tinyglobby';
-import { globResultCache } from './cache';
 import { isInMonorepo, isInWorkspace } from './is';
 import type { PM, Project } from './types';
 import { parseWorkspaceOption, readConfig, resolve } from './utils';
@@ -9,6 +7,7 @@ import { findPackages } from './vendor/find-packages';
 import { findUp } from './vendor/find-up';
 import { readPackageUp } from './vendor/read-package-up';
 import { readPackage } from './vendor/read-pkg';
+import { findPackageJsonPaths } from './workspace-scanner';
 
 /**
  * Finds all packages in a workspace by searching for package.json files matching the given glob patterns.
@@ -20,27 +19,13 @@ async function findPackagesInWorkspace(
     root: string,
     globs: string[],
 ): Promise<Project[]> {
-    // Convert globs to package.json search patterns
-    const patterns = globs.map((g) =>
-        path.join(root, g, 'package.json').replace(/\\/g, '/'),
-    );
-
-    // Find all package.json files with caching
-    const cacheKey = `pkg:${root}:${patterns.join(',')}`;
-    let packageJsonPaths = globResultCache.get(cacheKey);
-    if (!packageJsonPaths) {
-        packageJsonPaths = await glob(patterns, {
-            ignore: ['**/node_modules/**', '**/bower_components/**'],
-            absolute: true,
-            onlyFiles: true,
-        });
-        globResultCache.set(cacheKey, packageJsonPaths);
-    }
+    // Find all package.json files using custom scanner (with caching)
+    const packageJsonPaths = await findPackageJsonPaths(root, globs, { cache: true });
 
     // Read each package.json and create Project objects (uses packageJsonCache)
     const projects = await Promise.all(
         packageJsonPaths.map(async (manifestPath) => {
-            const rootDir = path.dirname(manifestPath);
+            const rootDir = manifestPath.replace(/\/package\.json$/, '');
             const manifest = await readPackage({ cwd: rootDir });
 
             return {

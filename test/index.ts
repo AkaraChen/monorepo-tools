@@ -8,3 +8,10 @@ export const pnpmFixture = path.join(fixture, 'pnpm');
 export const bunFixture = path.join(fixture, 'bun');
 export const bunJsonFixture = path.join(fixture, 'bun-json');
 export const denoFixture = path.join(fixture, 'deno');
+
+// vendor test fixtures
+export const vendorTestFixture = path.join(fixture, 'vendor-test');
+export const findUpFixture = path.join(vendorTestFixture, 'find-up');
+export const readPkgFixture = path.join(vendorTestFixture, 'read-pkg');
+export const findPackagesFixture = path.join(vendorTestFixture, 'find-packages');
+export const readPackageUpFixture = path.join(vendorTestFixture, 'read-package-up');
