@@ -8,7 +8,7 @@ import type {
 import { findUp } from 'find-up';
 import path from 'pathe';
 import { readPackageUp } from 'read-package-up';
-import { readPackage } from 'read-pkg';
+import { readPackage } from './vendor/read-pkg';
 import { Future } from 'sakiko';
 import { glob } from 'tinyglobby';
 import { isInMonorepo, isInWorkspace } from './is';

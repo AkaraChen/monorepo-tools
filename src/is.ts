@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import path from 'pathe';
-import { readPackage } from 'read-pkg';
+import { readPackage } from './vendor/read-pkg';
 import { Future } from 'sakiko';
 import { glob } from 'tinyglobby';
 import { readConfig } from './utils';
