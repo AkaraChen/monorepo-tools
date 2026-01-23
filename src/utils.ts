@@ -52,12 +52,8 @@ export function readConfig(root: string): Future<{
 
         const pnpm = await readPnpmWorkspaceYaml(root).result();
         if (pnpm.isOk()) {
-            const globs = pnpm.unwrap().packages;
-            if (globs) {
-                result = { pm: 'pnpm' as PM, globs };
-            } else {
-                throw new Error('Invalid pnpm-workspace.yaml');
-            }
+            const globs = pnpm.unwrap()?.packages ?? [];
+            result = { pm: 'pnpm' as PM, globs };
         } else {
             const pkg = await readPackage({ cwd: root });
             const globs = parseWorkspaceOption(pkg).unwrap();
@@ -74,12 +70,14 @@ export function readConfig(root: string): Future<{
 function readYaml<T>(file: string): Future<T> {
     return Future.from(async () => {
         const content = await readFile(file, 'utf-8');
-        return yaml.load(content) as T;
+        const parsed = yaml.load(content);
+        // Return empty object if yaml parses to null (e.g., only comments)
+        return (parsed ?? {}) as T;
     });
 }
 
 export function readPnpmWorkspaceYaml(
     dir: string,
 ): Future<Partial<PnpmWorkspaceYaml>> {
-    return Future.from(readYaml(path.join(dir, 'pnpm-workspace.yaml')));
+    return readYaml(path.join(dir, 'pnpm-workspace.yaml'));
 }

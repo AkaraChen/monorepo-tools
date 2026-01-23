@@ -38,11 +38,6 @@ export const DEFAULT_SKIP_DIRS = new Set([
     '.vscode',
     '.fleet',
 
-    // Temp / Logs
-    // Documentation (usually not packages)
-    'docs',
-    'documentation',
-
     // Misc tool directories
     '__pycache__',
     '.tox',
