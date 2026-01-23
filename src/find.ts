@@ -7,7 +7,7 @@ import type {
 } from '@pnpm/types';
 import { findUp } from 'find-up';
 import path from 'pathe';
-import { readPackageUp } from 'read-package-up';
+import { readPackageUp } from './vendor/read-package-up';
 import { readPackage } from './vendor/read-pkg';
 import { Future } from 'sakiko';
 import { glob } from 'tinyglobby';
