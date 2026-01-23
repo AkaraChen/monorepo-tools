@@ -5,7 +5,7 @@ import type {
     ProjectRootDir,
     ProjectRootDirRealPath,
 } from '@pnpm/types';
-import { findUp } from 'find-up';
+import { findUp } from './vendor/find-up';
 import path from 'pathe';
 import { readPackageUp } from './vendor/read-package-up';
 import { readPackage } from './vendor/read-pkg';
