@@ -37,10 +37,17 @@ export type PatternSegment =
 export function parsePattern(pattern: string): ParsedPattern {
     // Handle negation
     const isNegation = pattern.startsWith('!');
-    const cleanPattern = isNegation ? pattern.slice(1) : pattern;
+    let cleanPattern = isNegation ? pattern.slice(1) : pattern;
+
+    // Normalize: remove leading ./ or ./
+    if (cleanPattern.startsWith('./')) {
+        cleanPattern = cleanPattern.slice(2);
+    } else if (cleanPattern.startsWith('.\\')) {
+        cleanPattern = cleanPattern.slice(2);
+    }
 
     // Split into segments
-    const parts = cleanPattern.split('/').filter((p) => p !== '');
+    const parts = cleanPattern.split('/').filter((p) => p !== '' && p !== '.');
     const segments: PatternSegment[] = [];
     const staticParts: string[] = [];
     let foundWildcard = false;

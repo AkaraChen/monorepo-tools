@@ -1,10 +1,9 @@
 import { existsSync } from 'node:fs';
 import path from 'pathe';
 import { Future } from 'sakiko';
-import { glob } from 'tinyglobby';
-import { globResultCache } from './cache';
 import { readConfig } from './utils';
 import { readPackage } from './vendor/read-pkg';
+import { matchPattern, parsePattern } from './workspace-scanner/pattern';
 
 /**
  * Checks if the specified directory is the root of a monorepo.
@@ -49,31 +48,28 @@ export async function isInWorkspace(
     if (relative === '') {
         return true;
     }
-    // Use glob to find matching directories directly (with caching)
-    const cacheKey = `${root}:${globs.join(',')}`;
-    let globResults = globResultCache.get(cacheKey);
 
-    if (!globResults) {
-        globResults = await glob(globs, {
-            cwd: root,
-            onlyDirectories: true,
-            absolute: true,
-        });
-        globResultCache.set(cacheKey, globResults);
-    }
-    // Normalize paths and remove trailing slashes for comparison
-    const normalizedWorkspaceDir = path
-        .normalize(workspaceDir)
-        .replace(/[/\\]+$/, '');
-    // Check if workspaceDir matches any of the glob results
-    // or is a subdirectory of a glob result
-    for (const result of globResults) {
-        const normalizedResult = path.normalize(result).replace(/[/\\]+$/, '');
-        if (
-            normalizedWorkspaceDir === normalizedResult ||
-            normalizedWorkspaceDir.startsWith(normalizedResult + path.sep)
-        ) {
+    // Parse patterns and check if workspaceDir matches any
+    const parsedPatterns = globs
+        .filter((g) => !g.startsWith('!')) // Ignore negation patterns for this check
+        .map(parsePattern);
+
+    // Check if workspaceDir matches any positive pattern
+    for (const pattern of parsedPatterns) {
+        if (matchPattern(pattern, relative)) {
             return true;
+        }
+        // Also check if workspaceDir is a subdirectory of a pattern match
+        // e.g., pattern "packages/*" should match "packages/foo/src"
+        if (pattern.maxDepth !== -1) {
+            // For single-level patterns like packages/*, check if relative starts with a match
+            const parts = relative.split('/');
+            if (parts.length >= pattern.segments.length) {
+                const truncatedPath = parts.slice(0, pattern.segments.length).join('/');
+                if (matchPattern(pattern, truncatedPath)) {
+                    return true;
+                }
+            }
         }
     }
     return false;
